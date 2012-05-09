@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.directory.connector.ConnectorBasedDirectoryFactory">
+
+  <require>org.nuxeo.ecm.directory.DirectoryServiceImpl</require>
+
+  <implementation
+      class="org.nuxeo.directory.connector.ConnectorBasedDirectoryFactory"/>
+
+  <extension target="org.nuxeo.ecm.directory.DirectoryServiceImpl"
+      point="factoryDescriptor">
+    <factoryDescriptor
+        component="org.nuxeo.directory.connector.ConnectorBasedDirectoryFactory"/>
+  </extension>
+
+  <extension-point name="directories">
+        <object class="org.nuxeo.directory.connector.ConnectorBasedDirectoryDescriptor"/>
+  </extension-point>
+
+</component>
