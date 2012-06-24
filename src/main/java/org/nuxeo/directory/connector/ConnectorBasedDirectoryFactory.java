@@ -12,6 +12,7 @@ import org.nuxeo.ecm.directory.DirectoryException;
 import org.nuxeo.ecm.directory.DirectoryFactory;
 import org.nuxeo.ecm.directory.api.DirectoryService;
 import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.runtime.model.ComponentName;
 import org.nuxeo.runtime.model.DefaultComponent;
 import org.nuxeo.runtime.model.Extension;
 
@@ -21,6 +22,9 @@ import org.nuxeo.runtime.model.Extension;
  */
 public class ConnectorBasedDirectoryFactory extends DefaultComponent implements
         DirectoryFactory {
+
+    public static final ComponentName NAME = new ComponentName(
+            "org.nuxeo.directory.connector.ConnectorBasedDirectoryFactory");
 
     private final Map<String, ConnectorBasedDirectory> directories;
 
@@ -36,11 +40,10 @@ public class ConnectorBasedDirectoryFactory extends DefaultComponent implements
         } catch (Exception e) {
             throw new DirectoryException("Error in Directory Service lookup", e);
         }
-        // directoryService=MultiDirectoryFactory.getDirectoryService();
     }
 
     public String getName() {
-        return "connectorBasedDirectories";
+        return NAME.getName();
     }
 
     public void registerDirectory(ConnectorBasedDirectory directory) {
@@ -98,7 +101,6 @@ public class ConnectorBasedDirectoryFactory extends DefaultComponent implements
             } catch (DirectoryException e) {
                 log.error("Error while registring directory", e);
             }
-
         }
     }
 }
