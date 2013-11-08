@@ -38,8 +38,6 @@ import org.nuxeo.runtime.api.Framework;
  */
 public class ConnectorBasedDirectory extends AbstractDirectory {
 
-    public final String name;
-
     public final String schemaName;
 
     public final Set<String> schemaSet;
@@ -56,10 +54,8 @@ public class ConnectorBasedDirectory extends AbstractDirectory {
 
     public ConnectorBasedDirectory(ConnectorBasedDirectoryDescriptor descriptor)
             throws DirectoryException {
+        super(descriptor.getName());
         this.descriptor = descriptor;
-
-        this.name = descriptor.getName();
-        ;
         this.schemaName = descriptor.getSchemaName();
         this.schemaSet = new HashSet<String>();
         this.idField = descriptor.getIdField();
