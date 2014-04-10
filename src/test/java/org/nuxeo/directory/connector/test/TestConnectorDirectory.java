@@ -87,4 +87,31 @@ public class TestConnectorDirectory extends NXRuntimeTestCase {
         assertNotNull(entries);
         assertEquals(0, entries.totalSize());
     }
+    
+    @Test
+    public void testJsonDirectoryConnectorContrib() throws Exception {
+
+        deployContrib("org.nuxeo.directory.connector.test",
+                "OSGI-INF/testJsonDirectoryConnectorContrib.xml");
+        DirectoryService ds = Framework.getLocalService(DirectoryService.class);
+        assertNotNull(ds);
+
+        List<String> dsNames = ds.getDirectoryNames();
+        assertTrue(dsNames.contains("jsonDirectoryConnector"));
+
+        Directory d = ds.getDirectory("jsonDirectoryConnector");
+
+        Session session = d.getSession();
+        assertNotNull(session);
+
+        DocumentModelList entries = session.getEntries();
+        assertNotNull(entries);
+        assertEquals(50, entries.totalSize());
+
+        DocumentModel entry = session.getEntry("358317744");
+        assertNotNull(entry);
+        assertEquals("The Sea", (String) entry.getProperty("itunes", "trackName"));
+
+    }
+    
 }
