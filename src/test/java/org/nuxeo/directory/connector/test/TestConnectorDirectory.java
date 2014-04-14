@@ -103,14 +103,14 @@ public class TestConnectorDirectory extends NXRuntimeTestCase {
 
         Session session = d.getSession();
         assertNotNull(session);
-//
-//        DocumentModelList entries = session.getEntries();
-//        assertNotNull(entries);
-//        assertEquals(50, entries.totalSize());
-//
-//        DocumentModel entry = session.getEntry("358317744");
-//        assertNotNull(entry);
-//        assertEquals("The Sea", (String) entry.getProperty("itunes", "trackName"));
+
+        DocumentModelList entries = session.getEntries();
+        assertNotNull(entries);
+        assertEquals(50, entries.totalSize());
+
+        DocumentModel entry = session.getEntry("358317744");
+        assertNotNull(entry);
+        assertEquals("The Sea", (String) entry.getProperty("itunes", "trackName"));
 
     }
     
