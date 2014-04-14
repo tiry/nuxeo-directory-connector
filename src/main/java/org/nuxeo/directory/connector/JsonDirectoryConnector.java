@@ -15,8 +15,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -26,12 +24,10 @@ public class JsonDirectoryConnector extends AbstractInMemoryEntryConnector
         implements EntryConnector {
     
     protected Map<String, String> params;
-    protected ArrayList<HashMap<String, Object>> results;
-	protected Log log = LogFactory.getLog("hi");
+    public ArrayList<HashMap<String, Object>> results;
 
-    public ArrayList<HashMap<String, Object>> getJsonStream()
+    protected ArrayList<HashMap<String, Object>> getJsonStream()
     {
-
     	ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
     	
     	Client client = Client.create();
@@ -65,7 +61,6 @@ public class JsonDirectoryConnector extends AbstractInMemoryEntryConnector
             	Map<String, Object> map = new HashMap<String, Object>();
             	map = objectMapper.readValue(resultsNode.get(i), typeRef);
             	mapList.add((HashMap<String, Object>) map);
-
             } catch (IOException e) {
             	e.printStackTrace();
             }            
@@ -75,8 +70,10 @@ public class JsonDirectoryConnector extends AbstractInMemoryEntryConnector
     
     public List<String> getEntryIds() {
         List<String> ids = new ArrayList<String>();
-        for (int i = 0; i < results.size(); i++) {
-        	ids.add(results.get(i).get("trackId").toString());
+        if (results != null) {
+        	for (int i = 0; i < results.size(); i++) {
+        		ids.add(results.get(i).get("trackId").toString());
+        	}
         }
         return ids;
     }
@@ -84,22 +81,25 @@ public class JsonDirectoryConnector extends AbstractInMemoryEntryConnector
     public Map<String, Object> getEntryMap(String id) {
     	Map<String, Object> rc = new HashMap<String,Object>();
     	rc = null;
-    	
-    	for (int i = 0; i < results.size(); i++) {
-        	if (results.get(i).get("trackId").toString().equals(id)){
-        		rc = results.get(i);
-        		break;
-        	}
-        }
+    	if (results != null) {    	
+    		for (int i = 0; i < results.size(); i++) {
+    			if (results.get(i).get("trackId").toString().equals(id)){
+    				rc = results.get(i);
+    				break;
+    			}
+    		}
+    	}
         return rc;
     }
 
     public boolean hasEntry(String id) throws ClientException {
-        for (int i = 0; i < results.size(); i++) {
-        	if (results.get(i).get("trackId").equals(id)){
-        		return true;
-        	}
-        }
+    	if (results != null) {    	
+    		for (int i = 0; i < results.size(); i++) {
+    			if (results.get(i).get("trackId").equals(id)) {
+    				return true;
+    			}
+    		}
+    	}
         return false;
     }
 
@@ -107,7 +107,7 @@ public class JsonDirectoryConnector extends AbstractInMemoryEntryConnector
     public void init(ConnectorBasedDirectoryDescriptor descriptor) {
         super.init(descriptor);
         params = descriptor.getParameters();
-        results = getJsonStream();
+        results = this.getJsonStream();
     }
 
 
