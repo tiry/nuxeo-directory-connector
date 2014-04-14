@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:nxs="http://www.nuxeo.org/ecm/project/schemas/hbrown-SANDBOX/itunes" targetNamespace="http://www.nuxeo.org/ecm/project/schemas/hbrown-SANDBOX/itunes">  
+  <!-- helper XSD definitions for list types -->  
+  <xs:element name="artistId" type="xs:integer"/>
+  <xs:element name="artistName" type="xs:string"/>
+  <xs:element name="artistViewUrl" type="xs:string"/>
+  <xs:element name="artworkUrl100" type="xs:string"/>
+  <xs:element name="artworkUrl30" type="xs:string"/>
+  <xs:element name="artworkUrl60" type="xs:string"/>
+  <xs:element name="collectionCensoredName" type="xs:string"/>
+  <xs:element name="collectionExplicitness" type="xs:string"/>
+  <xs:element name="collectionId" type="xs:integer"/>
+  <xs:element name="collectionName" type="xs:string"/>
+  <xs:element name="collectionPrice" type="xs:double"/>
+  <xs:element name="collectionViewUrl" type="xs:string"/>
+  <xs:element name="country" type="xs:string"/>
+  <xs:element name="currency" type="xs:string"/>
+  <xs:element name="discCount" type="xs:integer"/>
+  <xs:element name="discNumber" type="xs:integer"/>
+  <xs:element name="kind" type="xs:string"/>
+  <xs:element name="previewUrl" type="xs:string"/>
+  <xs:element name="primaryGenreName" type="xs:string"/>
+  <xs:element name="radioStationUrl" type="xs:string"/>
+  <xs:element name="releaseDate" type="xs:string"/>
+  <xs:element name="trackCensoredName" type="xs:string"/>
+  <xs:element name="trackCount" type="xs:integer"/>
+  <xs:element name="trackExplicitness" type="xs:string"/>
+  <xs:element name="trackId" type="xs:integer"/>
+  <xs:element name="trackName" type="xs:string"/>
+  <xs:element name="trackNumber" type="xs:integer"/>
+  <xs:element name="trackPrice" type="xs:double"/>
+  <xs:element name="trackTimeMillis" type="xs:integer"/>
+  <xs:element name="trackViewUrl" type="xs:string"/>
+  <xs:element name="wrapperType" type="xs:string"/>
+</xs:schema>

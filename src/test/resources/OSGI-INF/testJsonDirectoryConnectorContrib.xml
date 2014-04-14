@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.directory.connector.jsontesting">
+
+  <extension point="schema" target="org.nuxeo.ecm.core.schema.TypeService">
+    <schema name="itunes" src="schemas/itunes.xsd"/>
+  </extension>
+
+  <extension
+    target="org.nuxeo.directory.connector.ConnectorBasedDirectoryFactory"
+    point="directories">
+
+    <directory name="jsonDirectoryConnector"
+      class="org.nuxeo.directory.connector.JsonDirectoryConnector">
+
+      <idField>username</idField>
+      <passwordField>password</passwordField>
+      <schema>itunes</schema>
+      <parameters>
+        <parameter name="url">https://itunes.apple.com/search?term=morcheeba</parameter>
+      </parameters>
+
+    </directory>
+  </extension>
+
+</component>
