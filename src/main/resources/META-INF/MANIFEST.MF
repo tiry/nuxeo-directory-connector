@@ -6,6 +6,5 @@ Bundle-Vendor: Nuxeo
 Bundle-Localization: bundle
 Bundle-ClassPath: .
 Eclipse-LazyStart: true
-Nuxeo-Component: OSGI-INF/connectorbased-directory-framework.xml,
- OSGI-INF/json-directory-connector-contrib.xml
+Nuxeo-Component: OSGI-INF/connectorbased-directory-framework.xml
 Require-Bundle: org.nuxeo.ecm.directory
