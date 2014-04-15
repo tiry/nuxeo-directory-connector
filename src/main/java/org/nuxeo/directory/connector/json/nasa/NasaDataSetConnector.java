@@ -36,7 +36,7 @@ public class NasaDataSetConnector extends BaseJSONDirectoryConnector {
 
     @Override
     public List<String> getEntryIds() {
-        return null;
+        return new ArrayList<String>();
     }
 
     @Override
