@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.nuxeo.directory.connector.ConnectorBasedDirectoryDescriptor;
@@ -18,8 +20,6 @@ import org.nuxeo.ecm.core.api.ClientException;
 
 public class JsonInMemoryDirectoryConnector extends BaseJSONDirectoryConnector
         implements EntryConnector {
-
-    protected Map<String, String> params;
 
     public ArrayList<HashMap<String, Object>> results;
 
@@ -38,20 +38,16 @@ public class JsonInMemoryDirectoryConnector extends BaseJSONDirectoryConnector
     protected ArrayList<HashMap<String, Object>> getJsonStream() {
         ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        JsonNode responseAsJson = call(params.get("url"), objectMapper);
+        JsonNode responseAsJson = call(params.get("url"));
 
         JsonNode resultsNode = extractResult(responseAsJson);
-        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
-        };
         for (int i = 0; i < resultsNode.size(); i++) {
             try {
                 Map<String, Object> map = new HashMap<String, Object>();
-                map = objectMapper.readValue(resultsNode.get(i), typeRef);
+                map = readAsMap(resultsNode.get(i));
                 mapList.add((HashMap<String, Object>) map);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Error while mapping JSON to Map", e);
             }
         }
         return mapList;
@@ -96,7 +92,6 @@ public class JsonInMemoryDirectoryConnector extends BaseJSONDirectoryConnector
     @Override
     public void init(ConnectorBasedDirectoryDescriptor descriptor) {
         super.init(descriptor);
-        params = descriptor.getParameters();
         results = this.getJsonStream();
         idField = descriptor.getIdField();
 

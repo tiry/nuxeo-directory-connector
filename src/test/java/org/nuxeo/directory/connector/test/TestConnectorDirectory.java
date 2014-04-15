@@ -142,4 +142,35 @@ public class TestConnectorDirectory extends NXRuntimeTestCase {
     }
 
 
+    @Test
+    public void testNasaDSDirectoryConnectorContrib() throws Exception {
+
+        deployContrib("org.nuxeo.directory.connector.test",
+                "OSGI-INF/testJsonDirectoryConnectorContrib.xml");
+        DirectoryService ds = Framework.getLocalService(DirectoryService.class);
+        assertNotNull(ds);
+
+        List<String> dsNames = ds.getDirectoryNames();
+        assertTrue(dsNames.contains("nasaDataSets"));
+
+        Directory d = ds.getDirectory("nasaDataSets");
+
+        Session session = d.getSession();
+        assertNotNull(session);
+
+
+        Map<String, Serializable> filter = new HashMap<>();
+        filter.put("category", "322");
+
+        DocumentModelList entries = session.query(filter);
+        assertNotNull(entries);
+        assertEquals(10, entries.totalSize());
+
+
+        DocumentModel entry = session.getEntry("707");
+        assertNotNull(entry);
+        assertEquals("lunar-sample-atlas", (String) entry.getProperty("nasads", "slug"));
+
+    }
+
 }

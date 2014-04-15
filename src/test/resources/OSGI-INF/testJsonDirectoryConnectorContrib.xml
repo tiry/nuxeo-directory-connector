@@ -4,6 +4,7 @@
   <extension point="schema" target="org.nuxeo.ecm.core.schema.TypeService">
     <schema name="itunes" src="schemas/itunes.xsd"/>
     <schema name="vocabulary" src="schemas/vocabulary.xsd"/>
+    <schema name="nasads" src="schemas/nasads.xsd"/>
   </extension>
 
   <extension
@@ -31,6 +32,20 @@
       </parameters>
       <mapping>
        <map field="label">title</map>
+       <map field="id">id</map>
+      </mapping>
+
+    </directory>
+
+    <directory name="nasaDataSets"
+      class="org.nuxeo.directory.connector.json.nasa.NasaDataSetConnector">
+
+      <idField>id</idField>
+      <schema>nasads</schema>
+      <parameters>
+        <parameter name="url">http://data.nasa.gov/api/</parameter>
+      </parameters>
+      <mapping>
        <map field="id">id</map>
       </mapping>
 
