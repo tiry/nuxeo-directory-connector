@@ -4,32 +4,37 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 /**
- * This is an base class that help implementing directory API on top of a pure
- * in memory structure.
+ * This is a helper class that provides a simplistic implementation of the directory search API using a full in memory search.
  *
- * This can be useful for testing of for service that does not support any
+ * This can be useful for testing service that does not support any
  * search feature.
+ *
+ * However, please note that this can not scale !
  *
  * @author <a href="mailto:tdelprat@nuxeo.com">Tiry</a>
  *
  */
-public abstract class AbstractInMemoryEntryConnector extends
-        AbstractEntryConnector implements EntryConnector {
+public class InMemorySearchHelper {
 
-    // Dummy in memory query
+    protected final EntryConnector connector;
+
+    public InMemorySearchHelper(EntryConnector connector) {
+        this.connector = connector;
+    }
+
     public List<String> queryEntryIds(Map<String, Serializable> filter,
             Set<String> fulltext) {
 
         List<String> ids = new ArrayList<String>();
 
         // do the search
-        data_loop: for (String id : getEntryIds()) {
+        data_loop: for (String id : connector.getEntryIds()) {
 
-            Map<String, Object> map = getEntryMap(id);
+            Map<String, Object> map = connector.getEntryMap(id);
             for (Entry<String, Serializable> e : filter.entrySet()) {
                 String fieldName = e.getKey();
                 Object expected = e.getValue();
@@ -56,4 +61,6 @@ public abstract class AbstractInMemoryEntryConnector extends
         }
         return ids;
     }
+
+
 }

@@ -1,5 +1,6 @@
 package org.nuxeo.directory.connector.test;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,15 +8,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.nuxeo.directory.connector.AbstractInMemoryEntryConnector;
+import org.nuxeo.directory.connector.AbstractEntryConnector;
 import org.nuxeo.directory.connector.ConnectorBasedDirectoryDescriptor;
 import org.nuxeo.directory.connector.EntryConnector;
+import org.nuxeo.directory.connector.InMemorySearchHelper;
 import org.nuxeo.ecm.core.api.ClientException;
 
-public class DummyTestConnector extends AbstractInMemoryEntryConnector
+public class DummyTestConnector extends AbstractEntryConnector
         implements EntryConnector {
 
     protected Map<String, String> params;
+
+    protected final InMemorySearchHelper searchHelper;
+
+    public DummyTestConnector() {
+        super();
+        searchHelper = new InMemorySearchHelper(this);
+    }
 
     public List<String> getEntryIds() {
         List<String> ids = new ArrayList<String>();
@@ -40,6 +49,13 @@ public class DummyTestConnector extends AbstractInMemoryEntryConnector
         }
         return map;
     }
+
+    @Override
+    public List<String> queryEntryIds(Map<String, Serializable> filter,
+            Set<String> fulltext) {
+        return searchHelper.queryEntryIds(filter, fulltext);
+    }
+
 
     public boolean hasEntry(String id) throws ClientException {
         return params.keySet().contains(id);

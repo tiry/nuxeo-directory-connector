@@ -10,7 +10,7 @@
     point="directories">
 
     <directory name="jsonDirectoryConnector"
-      class="org.nuxeo.directory.connector.JsonDirectoryConnector">
+      class="org.nuxeo.directory.connector.json.JsonInMemoryDirectoryConnector">
 
       <idField>username</idField>
       <passwordField>password</passwordField>

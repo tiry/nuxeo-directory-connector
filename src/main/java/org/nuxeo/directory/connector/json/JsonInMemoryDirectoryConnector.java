@@ -1,61 +1,44 @@
-package org.nuxeo.directory.connector;
+package org.nuxeo.directory.connector.json;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.nuxeo.directory.connector.AbstractInMemoryEntryConnector;
-import org.nuxeo.directory.connector.ConnectorBasedDirectoryDescriptor;
-import org.nuxeo.directory.connector.EntryConnector;
-import org.nuxeo.ecm.core.api.ClientException;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+import java.util.Set;
 
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.nuxeo.directory.connector.ConnectorBasedDirectoryDescriptor;
+import org.nuxeo.directory.connector.EntryConnector;
+import org.nuxeo.directory.connector.InMemorySearchHelper;
+import org.nuxeo.ecm.core.api.ClientException;
 
-public class JsonDirectoryConnector extends AbstractInMemoryEntryConnector
+public class JsonInMemoryDirectoryConnector extends BaseJSONDirectoryConnector
         implements EntryConnector {
 
     protected Map<String, String> params;
+
     public ArrayList<HashMap<String, Object>> results;
 
-    protected ArrayList<HashMap<String, Object>> getJsonStream()
-    {
+    protected final InMemorySearchHelper searchHelper;
+
+    public JsonInMemoryDirectoryConnector() {
+        searchHelper = new InMemorySearchHelper(this);
+    }
+
+    protected ArrayList<HashMap<String, Object>> getJsonStream() {
         ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
 
-        Client client = Client.create();
-        WebResource webResource = client.resource(params.get("url"));
-        ClientResponse response = webResource.accept("application/json")
-                .get(ClientResponse.class);
-
-        if (response.getStatus() != 200) {
-            throw new RuntimeException("Failed : HTTP error code : "
-                    + response.getStatus());
-        }
-
-        // response to map code from RestResponse
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode responseAsJson = null;
 
-        try {
-            responseAsJson = objectMapper.readTree(response.getEntityInputStream());
-        } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        JsonNode resultsNode = null;
-        resultsNode = responseAsJson.get("results");
-        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {};
+        JsonNode responseAsJson = call(params.get("url"), objectMapper);
+
+        JsonNode resultsNode = responseAsJson.get("results");
+        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+        };
         for (int i = 0; i < resultsNode.size(); i++) {
             try {
                 Map<String, Object> map = new HashMap<String, Object>();
@@ -79,11 +62,11 @@ public class JsonDirectoryConnector extends AbstractInMemoryEntryConnector
     }
 
     public Map<String, Object> getEntryMap(String id) {
-        Map<String, Object> rc = new HashMap<String,Object>();
+        Map<String, Object> rc = new HashMap<String, Object>();
         rc = null;
         if (results != null) {
             for (int i = 0; i < results.size(); i++) {
-                if (results.get(i).get("trackId").toString().equals(id)){
+                if (results.get(i).get("trackId").toString().equals(id)) {
                     rc = results.get(i);
                     break;
                 }
@@ -110,5 +93,10 @@ public class JsonDirectoryConnector extends AbstractInMemoryEntryConnector
         results = this.getJsonStream();
     }
 
+    @Override
+    public List<String> queryEntryIds(Map<String, Serializable> filter,
+            Set<String> fulltext) {
+        return searchHelper.queryEntryIds(filter, fulltext);
+    }
 
 }

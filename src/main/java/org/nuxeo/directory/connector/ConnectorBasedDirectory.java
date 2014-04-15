@@ -111,7 +111,6 @@ public class ConnectorBasedDirectory extends AbstractDirectory {
     public void shutdown() {
         if (session != null) {
             session.close();
-            descriptor.getConnector().close();
         }
         session = null;
     }

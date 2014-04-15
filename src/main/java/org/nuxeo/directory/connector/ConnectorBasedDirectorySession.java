@@ -21,9 +21,9 @@ import org.nuxeo.ecm.directory.Session;
 
 /**
  * Session for Directories based on a contributed connector
- * 
+ *
  * @author tiry
- * 
+ *
  */
 public class ConnectorBasedDirectorySession extends BaseSession implements
         Session {
@@ -44,15 +44,21 @@ public class ConnectorBasedDirectorySession extends BaseSession implements
     }
 
     public void close() {
-        connector.close();
+        if (connector!=null) {
+            connector.close();
+        }
     }
 
     public void commit() {
-        connector.commit();
+        if (connector!=null) {
+            connector.commit();
+        }
     }
 
     public void rollback() throws DirectoryException {
-        connector.rollback();
+        if (connector!=null) {
+            connector.rollback();
+        }
     }
 
     public DocumentModel createEntry(Map<String, Object> fieldMap)
