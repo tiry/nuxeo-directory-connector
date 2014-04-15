@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.common.xmap.annotation.XNode;
 import org.nuxeo.common.xmap.annotation.XNodeList;
 import org.nuxeo.common.xmap.annotation.XNodeMap;
@@ -17,6 +19,8 @@ public class ConnectorBasedDirectoryDescriptor implements Serializable {
      *
      */
     private static final long serialVersionUID = 1L;
+
+    protected Log log = LogFactory.getLog(ConnectorBasedDirectoryDescriptor.class);
 
     @XNode("@name")
     protected String name;

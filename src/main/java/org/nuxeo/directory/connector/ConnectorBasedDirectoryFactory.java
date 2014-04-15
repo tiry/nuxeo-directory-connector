@@ -12,13 +12,14 @@ import org.nuxeo.ecm.directory.DirectoryException;
 import org.nuxeo.ecm.directory.DirectoryFactory;
 import org.nuxeo.ecm.directory.api.DirectoryService;
 import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.runtime.model.ComponentContext;
 import org.nuxeo.runtime.model.ComponentName;
 import org.nuxeo.runtime.model.DefaultComponent;
 import org.nuxeo.runtime.model.Extension;
 
 /**
  * @author tiry
- * 
+ *
  */
 public class ConnectorBasedDirectoryFactory extends DefaultComponent implements
         DirectoryFactory {
@@ -28,28 +29,20 @@ public class ConnectorBasedDirectoryFactory extends DefaultComponent implements
 
     private final Map<String, ConnectorBasedDirectory> directories;
 
-    private static DirectoryService directoryService;
+    private final List<ConnectorBasedDirectoryDescriptor> pendingDirectories;
+
+    private DirectoryService directoryService;
 
     private static final Log log = LogFactory.getLog(ConnectorBasedDirectoryFactory.class);
 
     public ConnectorBasedDirectoryFactory() throws DirectoryException {
         directories = new HashMap<String, ConnectorBasedDirectory>();
-        // GR now NXRuntime provides the local one by default
-        try {
-            directoryService = Framework.getService(DirectoryService.class);
-        } catch (Exception e) {
-            throw new DirectoryException("Error in Directory Service lookup", e);
-        }
+        pendingDirectories = new ArrayList<ConnectorBasedDirectoryDescriptor>();
+        directoryService = Framework.getLocalService(DirectoryService.class);
     }
 
     public String getName() {
         return NAME.getName();
-    }
-
-    public void registerDirectory(ConnectorBasedDirectory directory) {
-        String directoryName = directory.getName();
-        directories.put(directoryName, directory);
-        directoryService.registerDirectory(directoryName, this);
     }
 
     public void unregisterDirectory(ConnectorBasedDirectory directory) {
@@ -62,45 +55,61 @@ public class ConnectorBasedDirectoryFactory extends DefaultComponent implements
         return directories.get(name);
     }
 
-    public static DirectoryService getDirectoryService() {
-        directoryService = (DirectoryService) Framework.getRuntime().getComponent(
-                DirectoryService.NAME);
-        if (directoryService == null) {
-            directoryService = Framework.getLocalService(DirectoryService.class);
-            if (directoryService == null) {
-                try {
-                    directoryService = Framework.getService(DirectoryService.class);
-                } catch (Exception e) {
-                    log.error("Can't find Directory Service", e);
-                }
-            }
-        }
-        return directoryService;
-    }
-
-    public void shutdown() {
-    }
 
     public List<Directory> getDirectories() {
         return new ArrayList<Directory>(directories.values());
     }
 
     @Override
+    public void applicationStarted(ComponentContext context) throws Exception {
+        if (Framework.isTestModeSet()) {
+            // when testing, DatabaseHelper init hasn't occurred yet,
+            // so keep to lazy initialization
+            return;
+        }
+        if (pendingDirectories.size()>0) {
+            for (ConnectorBasedDirectoryDescriptor descriptor: pendingDirectories) {
+                try {
+                    log.info("Register lazy directory " + descriptor.getName());
+                    registerDirectory(descriptor);
+                } catch (DirectoryException e) {
+                    log.error("Error while registring directory", e);
+                }
+            }
+        }
+    }
+
+    @Override
     public void registerExtension(Extension extension) {
         Object[] contribs = extension.getContributions();
-        DirectoryService dirService = getDirectoryService();
         for (Object contrib : contribs) {
             ConnectorBasedDirectoryDescriptor descriptor = (ConnectorBasedDirectoryDescriptor) contrib;
-            String name = descriptor.name;
-            ConnectorBasedDirectory directory;
             try {
-                directory = new ConnectorBasedDirectory(descriptor);
-                directories.put(name, directory);
-                dirService.registerDirectory(name, this);
-                log.info("Directory registered: " + name);
+                registerDirectory(descriptor);
             } catch (DirectoryException e) {
                 log.error("Error while registring directory", e);
             }
         }
     }
+
+    protected void registerDirectory(ConnectorBasedDirectoryDescriptor descriptor) throws DirectoryException {
+        ConnectorBasedDirectory directory = new ConnectorBasedDirectory(descriptor);
+        registerDirectory(directory);
+    }
+
+    public void registerDirectory(ConnectorBasedDirectory directory) {
+        String directoryName = directory.getName();
+        directories.put(directoryName, directory);
+        directoryService.registerDirectory(directoryName, this);
+        log.info("Directory registered: " + directoryName);
+    }
+
+    @Override
+    public void shutdown() throws DirectoryException {
+        for (ConnectorBasedDirectory dir : directories.values()) {
+            dir.shutdown();
+        }
+    }
+
+
 }

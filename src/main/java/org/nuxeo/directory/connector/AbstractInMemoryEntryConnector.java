@@ -7,6 +7,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+/**
+ * This is an base class that help implementing directory API on top of a pure
+ * in memory structure.
+ *
+ * This can be useful for testing of for service that does not support any
+ * search feature.
+ *
+ * @author <a href="mailto:tdelprat@nuxeo.com">Tiry</a>
+ *
+ */
 public abstract class AbstractInMemoryEntryConnector extends
         AbstractEntryConnector implements EntryConnector {
 

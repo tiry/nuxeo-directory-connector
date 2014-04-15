@@ -8,9 +8,9 @@ import org.nuxeo.ecm.directory.DirectoryException;
 
 /**
  * Abstract base class to Connector implementations
- * 
+ *
  * @author tiry
- * 
+ *
  */
 public abstract class AbstractEntryConnector implements EntryConnector {
 

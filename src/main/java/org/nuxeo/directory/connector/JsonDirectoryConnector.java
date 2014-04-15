@@ -22,84 +22,84 @@ import org.codehaus.jackson.type.TypeReference;
 
 public class JsonDirectoryConnector extends AbstractInMemoryEntryConnector
         implements EntryConnector {
-    
+
     protected Map<String, String> params;
     public ArrayList<HashMap<String, Object>> results;
 
     protected ArrayList<HashMap<String, Object>> getJsonStream()
     {
-    	ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
-    	
-    	Client client = Client.create();
-    	WebResource webResource = client.resource(params.get("url"));
-    	ClientResponse response = webResource.accept("application/json")
-    			.get(ClientResponse.class);
+        ArrayList<HashMap<String, Object>> mapList = new ArrayList<HashMap<String, Object>>();
 
-    	if (response.getStatus() != 200) {
-    		throw new RuntimeException("Failed : HTTP error code : "
-    				+ response.getStatus());
-    	} 
+        Client client = Client.create();
+        WebResource webResource = client.resource(params.get("url"));
+        ClientResponse response = webResource.accept("application/json")
+                .get(ClientResponse.class);
 
-    	// response to map code from RestResponse 
-    	ObjectMapper objectMapper = new ObjectMapper();
-    	JsonNode responseAsJson = null;
+        if (response.getStatus() != 200) {
+            throw new RuntimeException("Failed : HTTP error code : "
+                    + response.getStatus());
+        }
 
-    	try {
-    		responseAsJson = objectMapper.readTree(response.getEntityInputStream());
-    	} catch (JsonProcessingException e) {
-    		// TODO Auto-generated catch block
-    		e.printStackTrace();
-    	} catch (IOException e) {
-    		// TODO Auto-generated catch block
-    		e.printStackTrace();
-    	}
-		JsonNode resultsNode = null;
-		resultsNode = responseAsJson.get("results");
-    	TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {};
-    	for (int i = 0; i < resultsNode.size(); i++) {
+        // response to map code from RestResponse
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode responseAsJson = null;
+
+        try {
+            responseAsJson = objectMapper.readTree(response.getEntityInputStream());
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        JsonNode resultsNode = null;
+        resultsNode = responseAsJson.get("results");
+        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {};
+        for (int i = 0; i < resultsNode.size(); i++) {
             try {
-            	Map<String, Object> map = new HashMap<String, Object>();
-            	map = objectMapper.readValue(resultsNode.get(i), typeRef);
-            	mapList.add((HashMap<String, Object>) map);
+                Map<String, Object> map = new HashMap<String, Object>();
+                map = objectMapper.readValue(resultsNode.get(i), typeRef);
+                mapList.add((HashMap<String, Object>) map);
             } catch (IOException e) {
-            	e.printStackTrace();
-            }            
+                e.printStackTrace();
+            }
         }
         return mapList;
     }
-    
+
     public List<String> getEntryIds() {
         List<String> ids = new ArrayList<String>();
         if (results != null) {
-        	for (int i = 0; i < results.size(); i++) {
-        		ids.add(results.get(i).get("trackId").toString());
-        	}
+            for (int i = 0; i < results.size(); i++) {
+                ids.add(results.get(i).get("trackId").toString());
+            }
         }
         return ids;
     }
-    
+
     public Map<String, Object> getEntryMap(String id) {
-    	Map<String, Object> rc = new HashMap<String,Object>();
-    	rc = null;
-    	if (results != null) {    	
-    		for (int i = 0; i < results.size(); i++) {
-    			if (results.get(i).get("trackId").toString().equals(id)){
-    				rc = results.get(i);
-    				break;
-    			}
-    		}
-    	}
+        Map<String, Object> rc = new HashMap<String,Object>();
+        rc = null;
+        if (results != null) {
+            for (int i = 0; i < results.size(); i++) {
+                if (results.get(i).get("trackId").toString().equals(id)){
+                    rc = results.get(i);
+                    break;
+                }
+            }
+        }
         return rc;
     }
 
     public boolean hasEntry(String id) throws ClientException {
-    	if (results != null) {    	
-    		for (int i = 0; i < results.size(); i++) {
-    			if (results.get(i).get("trackId").equals(id)) {
-    				return true;
-    			}
-    		}
-    	}
+        if (results != null) {
+            for (int i = 0; i < results.size(); i++) {
+                if (results.get(i).get("trackId").equals(id)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 

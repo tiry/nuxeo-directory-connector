@@ -61,7 +61,7 @@ public class ConnectorBasedDirectory extends AbstractDirectory {
         this.idField = descriptor.getIdField();
         this.passwordField = descriptor.getPasswordField();
 
-        SchemaManager sm = getSchemaManager();
+        SchemaManager sm = Framework.getLocalService(SchemaManager.class);
         Schema sch = sm.getSchema(descriptor.getSchemaName());
         if (sch == null) {
             throw new DirectoryException("Unknown schema : "
@@ -75,23 +75,9 @@ public class ConnectorBasedDirectory extends AbstractDirectory {
         try {
             addReferences(descriptor.getInverseReferences());
         } catch (ClientException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    public SchemaManager getSchemaManager() throws DirectoryException {
-        SchemaManager sm;
-        try {
-            sm = Framework.getService(SchemaManager.class);
-        } catch (Exception e) {
-            throw new DirectoryException("Unable to look up Core Type Service",
+            log.error("Error during Connector based Directory initialization",
                     e);
         }
-        if (sm == null) {
-            throw new DirectoryException("Unable to look up type service");
-        }
-        return sm;
     }
 
     public String getName() {
@@ -123,6 +109,10 @@ public class ConnectorBasedDirectory extends AbstractDirectory {
     }
 
     public void shutdown() {
+        if (session != null) {
+            session.close();
+            descriptor.getConnector().close();
+        }
         session = null;
     }
 
