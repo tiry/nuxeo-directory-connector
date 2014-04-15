@@ -43,6 +43,9 @@ public class ConnectorBasedDirectoryDescriptor implements Serializable {
     @XNodeList(value = "references/inverseReference", type = InverseReference[].class, componentType = InverseReference.class)
     private InverseReference[] inverseReferences;
 
+    @XNodeMap(value = "mapping/map", key = "@field", type = HashMap.class, componentType = String.class)
+    protected Map<String, String> mapping = new HashMap<String, String>();
+
     public Reference[] getInverseReferences() {
         return inverseReferences;
     }
@@ -59,7 +62,7 @@ public class ConnectorBasedDirectoryDescriptor implements Serializable {
                 connector = (EntryConnector) connectorClass.newInstance();
                 connector.init(this);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Unable to get connector", e);
             }
         }
         return connector;
@@ -84,4 +87,10 @@ public class ConnectorBasedDirectoryDescriptor implements Serializable {
     public String getPasswordField() {
         return passwordField;
     }
+
+    public Map<String, String> getMapping() {
+        return mapping;
+    }
+
+
 }

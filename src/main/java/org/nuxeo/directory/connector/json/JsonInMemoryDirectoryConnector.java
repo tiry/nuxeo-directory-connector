@@ -25,8 +25,14 @@ public class JsonInMemoryDirectoryConnector extends BaseJSONDirectoryConnector
 
     protected final InMemorySearchHelper searchHelper;
 
+    protected String idField;
+
     public JsonInMemoryDirectoryConnector() {
         searchHelper = new InMemorySearchHelper(this);
+    }
+
+    protected JsonNode extractResult(JsonNode responseAsJson) {
+        return responseAsJson.get("results");
     }
 
     protected ArrayList<HashMap<String, Object>> getJsonStream() {
@@ -36,7 +42,7 @@ public class JsonInMemoryDirectoryConnector extends BaseJSONDirectoryConnector
 
         JsonNode responseAsJson = call(params.get("url"), objectMapper);
 
-        JsonNode resultsNode = responseAsJson.get("results");
+        JsonNode resultsNode = extractResult(responseAsJson);
         TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
         };
         for (int i = 0; i < resultsNode.size(); i++) {
@@ -52,10 +58,11 @@ public class JsonInMemoryDirectoryConnector extends BaseJSONDirectoryConnector
     }
 
     public List<String> getEntryIds() {
+
         List<String> ids = new ArrayList<String>();
         if (results != null) {
             for (int i = 0; i < results.size(); i++) {
-                ids.add(results.get(i).get("trackId").toString());
+                ids.add(results.get(i).get(idField).toString());
             }
         }
         return ids;
@@ -66,7 +73,7 @@ public class JsonInMemoryDirectoryConnector extends BaseJSONDirectoryConnector
         rc = null;
         if (results != null) {
             for (int i = 0; i < results.size(); i++) {
-                if (results.get(i).get("trackId").toString().equals(id)) {
+                if (results.get(i).get(idField).toString().equals(id)) {
                     rc = results.get(i);
                     break;
                 }
@@ -78,7 +85,7 @@ public class JsonInMemoryDirectoryConnector extends BaseJSONDirectoryConnector
     public boolean hasEntry(String id) throws ClientException {
         if (results != null) {
             for (int i = 0; i < results.size(); i++) {
-                if (results.get(i).get("trackId").equals(id)) {
+                if (results.get(i).get(idField).equals(id)) {
                     return true;
                 }
             }
@@ -91,6 +98,8 @@ public class JsonInMemoryDirectoryConnector extends BaseJSONDirectoryConnector
         super.init(descriptor);
         params = descriptor.getParameters();
         results = this.getJsonStream();
+        idField = descriptor.getIdField();
+
     }
 
     @Override

@@ -12,8 +12,7 @@
     <directory name="jsonDirectoryConnector"
       class="org.nuxeo.directory.connector.json.JsonInMemoryDirectoryConnector">
 
-      <idField>username</idField>
-      <passwordField>password</passwordField>
+      <idField>trackId</idField>
       <schema>itunes</schema>
       <parameters>
         <parameter name="url">https://itunes.apple.com/search?term=morcheeba</parameter>

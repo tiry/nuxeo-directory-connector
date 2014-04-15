@@ -3,6 +3,7 @@
 
   <extension point="schema" target="org.nuxeo.ecm.core.schema.TypeService">
     <schema name="itunes" src="schemas/itunes.xsd"/>
+    <schema name="vocabulary" src="schemas/vocabulary.xsd"/>
   </extension>
 
   <extension
@@ -12,14 +13,29 @@
     <directory name="jsonDirectoryConnector"
       class="org.nuxeo.directory.connector.json.JsonInMemoryDirectoryConnector">
 
-      <idField>username</idField>
-      <passwordField>password</passwordField>
+      <idField>trackId</idField>
       <schema>itunes</schema>
       <parameters>
         <parameter name="url">https://itunes.apple.com/search?term=morcheeba</parameter>
       </parameters>
 
     </directory>
+
+    <directory name="nasaCategories"
+      class="org.nuxeo.directory.connector.json.nasa.NasaInMemoryCategoryConnector">
+
+      <idField>id</idField>
+      <schema>vocabulary</schema>
+      <parameters>
+        <parameter name="url">http://data.nasa.gov/api/get_category_index/</parameter>
+      </parameters>
+      <mapping>
+       <map field="label">title</map>
+       <map field="id">id</map>
+      </mapping>
+
+    </directory>
+
   </extension>
 
 </component>

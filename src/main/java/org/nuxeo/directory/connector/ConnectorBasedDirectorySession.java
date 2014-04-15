@@ -14,10 +14,14 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.schema.SchemaManager;
+import org.nuxeo.ecm.core.schema.types.Field;
+import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.directory.BaseSession;
 import org.nuxeo.ecm.directory.DirectoryException;
 import org.nuxeo.ecm.directory.Reference;
 import org.nuxeo.ecm.directory.Session;
+import org.nuxeo.runtime.api.Framework;
 
 /**
  * Session for Directories based on a contributed connector
@@ -70,6 +74,22 @@ public class ConnectorBasedDirectorySession extends BaseSession implements
         return getEntry(id, true);
     }
 
+    protected Map<String, Object> translate(Map<String, Object> map) {
+        Schema schema = Framework.getLocalService(SchemaManager.class).getSchema(directory.getSchema());
+        Map<String, Object> newMap = new HashMap<>();
+
+        Map<String, String> mapping = directory.descriptor.getMapping();
+        for (Field field : schema.getFields()) {
+            String fieldId = field.getName().getLocalName();
+            if (mapping.containsKey(fieldId)) {
+                newMap.put(fieldId, field.getType().encode(map.get(mapping.get(fieldId))));
+            } else {
+                newMap.put(fieldId, map.get(fieldId));
+            }
+        }
+        return newMap;
+    }
+
     public DocumentModel getEntry(String id, boolean fetchReferences)
             throws DirectoryException {
         // XXX no references here
@@ -78,6 +98,10 @@ public class ConnectorBasedDirectorySession extends BaseSession implements
         if (map == null) {
             return null;
         }
+
+        // manage translation
+        map = translate(map);
+
         try {
             DocumentModel entry = BaseSession.createEntryModel(null,
                     directory.schemaName, id, map);

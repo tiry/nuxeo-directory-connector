@@ -87,7 +87,7 @@ public class TestConnectorDirectory extends NXRuntimeTestCase {
         assertNotNull(entries);
         assertEquals(0, entries.totalSize());
     }
-    
+
     @Test
     public void testJsonDirectoryConnectorContrib() throws Exception {
 
@@ -113,5 +113,33 @@ public class TestConnectorDirectory extends NXRuntimeTestCase {
         assertEquals("The Sea", (String) entry.getProperty("itunes", "trackName"));
 
     }
-    
+
+
+    @Test
+    public void testNasaDirectoryConnectorContrib() throws Exception {
+
+        deployContrib("org.nuxeo.directory.connector.test",
+                "OSGI-INF/testJsonDirectoryConnectorContrib.xml");
+        DirectoryService ds = Framework.getLocalService(DirectoryService.class);
+        assertNotNull(ds);
+
+        List<String> dsNames = ds.getDirectoryNames();
+        assertTrue(dsNames.contains("nasaCategories"));
+
+        Directory d = ds.getDirectory("nasaCategories");
+
+        Session session = d.getSession();
+        assertNotNull(session);
+
+        DocumentModelList entries = session.getEntries();
+        assertNotNull(entries);
+        assertEquals(9, entries.totalSize());
+
+        DocumentModel entry = session.getEntry("178");
+        assertNotNull(entry);
+        assertEquals("Aeronautics", (String) entry.getProperty("vocabulary", "label"));
+
+    }
+
+
 }
